@@ -30,6 +30,17 @@ export default ({ data }) => {
           </Link>
           </div>
         ))}
+        <h2>Strapi Articles</h2>
+        <ul>
+          {data.allStrapiArticle.edges.map(document => (
+            <li key={document.node.id}>
+              <h2>
+                <Link to={`/${document.node.id}`}>{document.node.title}</Link>
+              </h2>
+              <p>{document.node.content}</p>
+            </li>
+          ))}
+        </ul>
       </div>
     </Layout>
   )
@@ -49,6 +60,15 @@ export const query = graphql`
             slug
           }
           excerpt
+        }
+      }
+    }
+    allStrapiArticle {
+      edges {
+        node {
+          id
+          title
+          content
         }
       }
     }
