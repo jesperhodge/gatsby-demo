@@ -1,36 +1,38 @@
-import React from "react"
+import React, { useState } from "react"
 import { Link, graphql } from "gatsby"
 import Layout from "../components/layout"
+import Img from "gatsby-image"
 
 export default ({ data }) => {
-  console.log(data)
-  return (
-    <Layout>
+  const [display, setDisplay] = useState(false)
+
+  const showContent = (
       <div>
-        <h1
+        <h1>Markdown files</h1>
+        <h4
           style={{ display: 'inline-block', borderBottom: '1px solid' }}
         >
           Amazing Pandas Eating Things
-        </h1>
-        <h4>{data.allMarkdownRemark.totalCount} Posts</h4>
+        </h4>
+        <h5>{data.allMarkdownRemark.totalCount} Posts</h5>
         {data.allMarkdownRemark.edges.map(({ node }) => (
           <div key={node.id}>
             <Link
               to={node.fields.slug}
             >
-            <h3 style={{ marginBottom: '50px' }}>
-              {node.frontmatter.title}{" "}
-              <span
-                style={{ color: '#bbb' }}
-              >
-                — {node.frontmatter.date}
-              </span>
-            </h3>
-            <p>{node.excerpt}</p>
-          </Link>
+              <h5 style={{ marginBottom: '50px' }}>
+                {node.frontmatter.title}{" "}
+                <span
+                  style={{ color: '#bbb' }}
+                >
+                  — {node.frontmatter.date}
+                </span>
+              </h5>
+              <p>{node.excerpt}</p>
+            </Link>
           </div>
         ))}
-        <h2>Strapi Articles</h2>
+        <h1>CMS Posts</h1>
         <ul>
           {data.allStrapiArticle.edges.map(document => (
             <li key={document.node.id}>
@@ -38,10 +40,18 @@ export default ({ data }) => {
                 <Link to={`/${document.node.id}`}>{document.node.title}</Link>
               </h2>
               <p>{document.node.content}</p>
+              <Img fixed={document.node.image.childImageSharp.fixed}/>
             </li>
           ))}
         </ul>
       </div>
+  )
+
+  return (
+    <Layout>
+      <button onClick={() => { setDisplay(!display) }}>Display Content</button>
+      <br />
+      {display ? showContent : null}
     </Layout>
   )
 }
@@ -67,6 +77,13 @@ export const query = graphql`
       edges {
         node {
           id
+          image {
+            childImageSharp {
+              fixed(width: 200, height: 125) {
+                ...GatsbyImageSharpFixed
+              }
+            }
+          }
           title
           content
         }

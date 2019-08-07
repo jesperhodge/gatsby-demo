@@ -13,20 +13,40 @@ exports.onCreateNode = ({ node, getNode, actions }) => {
   }
 }
 
+const makeRequest = (graphql, request) => new Promise((resolve, reject) => {
+  // Query for nodes to use in creating pages.
+  resolve(
+    graphql(request).then(result => {
+      if (result.errors) {
+        reject(result.errors)
+      }
+
+      return result;
+    })
+  )
+});
+
 exports.createPages = ({ graphql, actions }) => {
   const { createPage } = actions
   return graphql(`
-    {
-      allMarkdownRemark {
-        edges {
-          node {
-            fields {
-              slug
-            }
+  {
+    allStrapiArticle {
+      edges {
+        node {
+          id
+        }
+      }
+    }
+    allMarkdownRemark {
+      edges {
+        node {
+          fields {
+            slug
           }
         }
       }
     }
+  }
   `).then(result => {
     result.data.allMarkdownRemark.edges.forEach(({ node }) => {
       createPage({
@@ -36,6 +56,15 @@ exports.createPages = ({ graphql, actions }) => {
           // Data passed to context is available
           // in page queries as GraphQL variables.
           slug: node.fields.slug,
+        },
+      })
+    })
+    result.data.allStrapiArticle.edges.forEach(({ node }) => {
+      createPage({
+        path: `/${node.id}`,
+        component: path.resolve(`src/templates/article.js`),
+        context: {
+          id: node.id,
         },
       })
     })
