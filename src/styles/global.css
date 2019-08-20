@@ -1,1 +1,4 @@
 body { background-color: #eeeeee }
+.wide { width: 500px }
+.narrow {width: 100px }
+p { color: 'white' }
